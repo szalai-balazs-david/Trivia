@@ -31,7 +31,7 @@ def create_app(test_config=None):
   '''
   @app.route('/categories', methods=['GET'])
   def get_categories():
-      return 'GETTING MESSAGES'
+      return 'Get Categories'
 
 
   '''
@@ -48,7 +48,7 @@ def create_app(test_config=None):
   '''
   @app.route('/questions', methods=['GET'])
   def get_questions():
-      return 'GETTING MESSAGES'
+      return 'Get Questions'
 
   '''
   @TODO: 
@@ -57,6 +57,9 @@ def create_app(test_config=None):
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
   '''
+  @app.route('/questions/<question_id>', methods=['DELETE'])
+  def delete_question(question_id):
+      return 'I should delete question #' + str(question_id)
 
   '''
   @TODO: 
@@ -68,6 +71,9 @@ def create_app(test_config=None):
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
   '''
+  @app.route('/questions', methods=['POST'])
+  def create_question():
+      return 'Post a new Question'
 
   '''
   @TODO: 
@@ -79,6 +85,9 @@ def create_app(test_config=None):
   only question that include that string within their question. 
   Try using the word "title" to start. 
   '''
+  @app.route('/questions/search', methods=['POST'])
+  def search_questions():
+      return 'Search for a question'
 
   '''
   @TODO: 
@@ -88,6 +97,9 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
+  @app.route('/questions/<category_ID>', methods=['GET'])
+  def get_questions_in_category(category_ID):
+      return 'Get questions in category #' + str(category_ID)
 
 
   '''
@@ -101,12 +113,30 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+  @app.route('/', methods=['POST'])
+  def ask_question():
+      return 'Ask a question'
 
   '''
   @TODO: 
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
+  @app.errorhandler(404)
+  def not_found(error):
+    return jsonify({
+      "success": False,
+      "error": 404,
+      "message": "Not found"
+    }), 404
+
+  @app.errorhandler(422)
+  def unprocessable(error):
+    return jsonify({
+      "success": False,
+      "error": 422,
+      "message": "Unprocessable"
+    }), 422
   
   return app
 
