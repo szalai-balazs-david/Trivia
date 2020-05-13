@@ -33,6 +33,11 @@ class TriviaTestCase(unittest.TestCase):
     TODO
     Write at least one test for each test for successful operation and for expected errors.
     """
+    def test_this_test_fails_on_purpose(self):
+        self.assertTrue(False)
+
+        def test_this_test_passes_on_purpose(self):
+            self.assertTrue(True)
 
 
 # Make the tests conveniently executable
