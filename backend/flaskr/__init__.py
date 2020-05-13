@@ -31,17 +31,21 @@ def create_app(test_config=None):
           "message": message
       })
 
-  '''
-  @TODO: 
-  Create an endpoint to handle GET requests 
-  for all available categories.
-  '''
+  def get_categories_method():
+      data = []
+      for cat in Category.query.all():
+          data.append(cat.type)
+      return data
+
+  def get_questions_method(questions):
+      data = []
+      for q in questions:
+          data.append(q.format())
+      return data
+
   @app.route('/categories', methods=['GET'])
   def get_categories():
-    data = []
-    for cat in Category.query.all():
-      data.append(cat.type)
-    return get_response(data)
+      return get_response(get_categories_method())
 
 
   '''
@@ -58,6 +62,29 @@ def create_app(test_config=None):
   '''
   @app.route('/questions', methods=['GET'])
   def get_questions():
+    page = request.args.get('page', 1, type=int)
+    category = request.args.get('category', 'all', type=str)
+
+    if(category == 'all'):
+      questions = Question.query.all()
+    else:
+      if (Category.query.filter(Category.type == category).count() == 0):
+        abort(404)
+      category_id = Category.query.filter(Category.type == category).first().id
+      questions = Question.query.filter(Question.category == category_id).all()
+
+    questions_per_page = 10
+    first_question_index = (page - 1) * questions_per_page
+    if (len(questions) < first_question_index):
+      abort(404)
+
+    return get_response({
+      'current_category': category,
+      'categories': get_categories_method(),
+      'question_count': Question.query.count(),
+      'questions': get_questions_method(questions[first_question_index:(first_question_index+questions_per_page)])
+    })
+
     abort(501)
 
   '''
