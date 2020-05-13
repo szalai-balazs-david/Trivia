@@ -29,15 +29,30 @@ class TriviaTestCase(unittest.TestCase):
         """Executed after reach test"""
         pass
 
+    def check_if_operation_was_successful_and_get_payload(self, data):
+        self.assertTrue(data['success'])
+        self.assertEqual(0, data['error'])
+        return data['message']
+
+    def check_if_operation_failed_with_error_code(self, data, expected_error_code):
+        self.assertFalse(data['success'])
+        self.assertEqual(expected_error_code, data['error'])
+
     """
     TODO
     Write at least one test for each test for successful operation and for expected errors.
     """
-    def test_this_test_fails_on_purpose(self):
-        self.assertTrue(False)
+    def test_get_categories_returns_list_of_categories(self):
+        res = self.client().get('/categories')
+        data = json.loads(res.data)
+        message = self.check_if_operation_was_successful_and_get_payload(data)
 
-        def test_this_test_passes_on_purpose(self):
-            self.assertTrue(True)
+        self.assertTrue('Science' in message)
+        self.assertTrue('Art' in message)
+        self.assertTrue('Geography' in message)
+        self.assertTrue('History' in message)
+        self.assertTrue('Entertainment' in message)
+        self.assertTrue('Sports' in message)
 
 
 # Make the tests conveniently executable

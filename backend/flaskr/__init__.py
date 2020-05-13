@@ -11,7 +11,7 @@ QUESTIONS_PER_PAGE = 10
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
-  setup_db(app, 'postgresql://postgres@localhost:5432/trivia')
+  setup_db(app, 'postgresql://localhost:5432/trivia')
   cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
   '''
@@ -24,6 +24,13 @@ def create_app(test_config=None):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE,OPTIONS')
     return response
 
+  def get_response(message, success=True, error=0):
+      return jsonify({
+          "success": success,
+          "error": error,
+          "message": message
+      })
+
   '''
   @TODO: 
   Create an endpoint to handle GET requests 
@@ -31,24 +38,27 @@ def create_app(test_config=None):
   '''
   @app.route('/categories', methods=['GET'])
   def get_categories():
-      return 'Get Categories'
+    data = []
+    for cat in Category.query.all():
+      data.append(cat.type)
+    return get_response(data)
 
 
   '''
-  @TODO: 
-  Create an endpoint to handle GET requests for questions, 
-  including pagination (every 10 questions). 
-  This endpoint should return a list of questions, 
-  number of total questions, current category, categories. 
+  @TODO:
+  Create an endpoint to handle GET requests for questions,
+  including pagination (every 10 questions).
+  This endpoint should return a list of questions,
+  number of total questions, current category, categories.
 
   TEST: At this point, when you start the application
   you should see questions and categories generated,
   ten questions per page and pagination at the bottom of the screen for three pages.
-  Clicking on the page numbers should update the questions. 
+  Clicking on the page numbers should update the questions.
   '''
   @app.route('/questions', methods=['GET'])
   def get_questions():
-      return 'Get Questions'
+    abort(501)
 
   '''
   @TODO: 
@@ -59,7 +69,7 @@ def create_app(test_config=None):
   '''
   @app.route('/questions/<question_id>', methods=['DELETE'])
   def delete_question(question_id):
-      return 'I should delete question #' + str(question_id)
+    abort(501)
 
   '''
   @TODO: 
@@ -73,7 +83,7 @@ def create_app(test_config=None):
   '''
   @app.route('/questions', methods=['POST'])
   def create_question():
-      return 'Post a new Question'
+    abort(501)
 
   '''
   @TODO: 
@@ -87,7 +97,7 @@ def create_app(test_config=None):
   '''
   @app.route('/questions/search', methods=['POST'])
   def search_questions():
-      return 'Search for a question'
+    abort(501)
 
   '''
   @TODO: 
@@ -99,7 +109,7 @@ def create_app(test_config=None):
   '''
   @app.route('/questions/<category_ID>', methods=['GET'])
   def get_questions_in_category(category_ID):
-      return 'Get questions in category #' + str(category_ID)
+    abort(501)
 
 
   '''
@@ -115,7 +125,7 @@ def create_app(test_config=None):
   '''
   @app.route('/', methods=['POST'])
   def ask_question():
-      return 'Ask a question'
+    abort(501)
 
   '''
   @TODO: 
@@ -124,20 +134,16 @@ def create_app(test_config=None):
   '''
   @app.errorhandler(404)
   def not_found(error):
-    return jsonify({
-      "success": False,
-      "error": 404,
-      "message": "Not found"
-    }), 404
+    return get_response("Not found", False, 404), 404
 
   @app.errorhandler(422)
   def unprocessable(error):
-    return jsonify({
-      "success": False,
-      "error": 422,
-      "message": "Unprocessable"
-    }), 422
-  
+    return get_response("Unprocessable", False, 422), 422
+
+  @app.errorhandler(501)
+  def not_implemented(error):
+    return get_response("Not Implemented", False, 501), 501
+
   return app
 
     
