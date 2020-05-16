@@ -99,7 +99,7 @@ def create_app(test_config=None):
         if 'difficulty' not in data:
             abort(422)
         if Category.query.filter(Category.type==data['category']).count() != 1:
-            abort(422)
+            abort(404)
 
         cat_id = Category.query.filter(Category.type==data['category']).all()[0].id
         q = Question(data['question'], data['answer'], cat_id, data['difficulty'])
@@ -108,20 +108,31 @@ def create_app(test_config=None):
             'question': q.format()
         })
 
-    '''
-    @TODO: 
-    Create a POST endpoint to get questions based on a search term. 
-    It should return any questions for whom the search term 
-    is a substring of the question. 
-  
-    TEST: Search by any phrase. The questions list will update to include 
-    only question that include that string within their question. 
-    Try using the word "title" to start. 
-    '''
-
     @app.route('/questions/search', methods=['POST'])
     def search_questions():
-        abort(501)
+        data = request.json
+        if 'search_term' not in data:
+            abort(422)
+
+        search_term = data['search_term']
+        if 'page' not in data:
+            page = 1
+        else:
+            page = data['page']
+
+
+        questions = Question.query.filter(Question.question.ilike('%{}%'.format(search_term))).all()
+
+        questions_per_page = 10
+        first_question_index = (page - 1) * questions_per_page
+        if (len(questions) <= first_question_index):
+            abort(404)
+
+        return get_response({
+            'question_count': len(questions),
+            'questions': get_questions_method(
+                questions[first_question_index:(first_question_index + questions_per_page)])
+        })
 
     '''
     @TODO: 
