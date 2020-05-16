@@ -24,6 +24,10 @@ class TriviaTestCase(unittest.TestCase):
             self.db.init_app(self.app)
             # create all tables
             self.db.create_all()
+
+            self.db.session.query(Question).delete()
+            self.db.session.query(Category).delete()
+            self.db.session.commit()
     
     def tearDown(self):
         """Executed after reach test"""
@@ -38,40 +42,50 @@ class TriviaTestCase(unittest.TestCase):
         self.assertFalse(data['success'])
         self.assertEqual(expected_error_code, data['error'])
 
-    """
-    TODO
-    Write at least one test for each test for successful operation and for expected errors.
-    """
+    def add_data_to_database(self, categories_and_questions):
+        with self.app.app_context():
+            self.db = SQLAlchemy()
+            self.db.init_app(self.app)
+
+            for i in range(len(categories_and_questions)):
+                cat = Category("Category" + str(i+1))
+                self.db.session.add(cat)
+                self.db.session.commit()
+                for j in range(categories_and_questions[i]):
+                    question = Question("Question" + str(i) + "." + str(j), "Answer" + str(i) + "." + str(j), cat.id, 1)
+                    self.db.session.add(question)
+            self.db.session.commit()
+
     def test_get_categories_returns_list_of_categories(self):
+        self.add_data_to_database([1, 2, 1])
+
         res = self.client().get('/categories')
         data = json.loads(res.data)
         message = self.check_if_operation_was_successful_and_get_payload(data)
 
-        self.assertTrue('Science' in message)
-        self.assertTrue('Art' in message)
-        self.assertTrue('Geography' in message)
-        self.assertTrue('History' in message)
-        self.assertTrue('Entertainment' in message)
-        self.assertTrue('Sports' in message)
+        self.assertTrue('Category1' in message)
+        self.assertTrue('Category2' in message)
+        self.assertTrue('Category3' in message)
 
     def test_get_questions_returns_list_of_categories(self):
-        res = self.client().get('/questions?category=Science')
+        self.add_data_to_database([1, 2, 1])
+
+        res = self.client().get('/questions?category=Category1')
         data = json.loads(res.data)
         message = self.check_if_operation_was_successful_and_get_payload(data)['categories']
 
-        self.assertTrue('Science' in message)
-        self.assertTrue('Art' in message)
-        self.assertTrue('Geography' in message)
-        self.assertTrue('History' in message)
-        self.assertTrue('Entertainment' in message)
-        self.assertTrue('Sports' in message)
+        self.assertTrue('Category1' in message)
+        self.assertTrue('Category2' in message)
+        self.assertTrue('Category3' in message)
 
     def test_get_questions_if_category_is_provided_then_returns_current_category(self):
-        res = self.client().get('/questions?category=Science')
+        self.add_data_to_database([1, 2, 1])
+
+        res = self.client().get('/questions?category=Category1')
         data = json.loads(res.data)
         message = self.check_if_operation_was_successful_and_get_payload(data)
 
-        self.assertEqual("Science", message['current_category'])
+        self.assertEqual("Category1", message['current_category'])
 
     def test_get_questions_if_no_category_is_provided_returns_current_category_with_value_all(self):
         res = self.client().get('/questions')
@@ -81,28 +95,34 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual('all', message['current_category'])
 
     def test_get_questions_returns_number_of_total_questions(self):
-        res = self.client().get('/questions?category=Science')
+        self.add_data_to_database([1, 2, 1])
+
+        res = self.client().get('/questions?category=Category1')
         data = json.loads(res.data)
         message = self.check_if_operation_was_successful_and_get_payload(data)
 
-        self.assertEqual(19, message['question_count'])
+        self.assertEqual(4, message['question_count'])
 
     def test_get_questions_returns_10_questions_if_possible(self):
-        res = self.client().get('/questions')
+        self.add_data_to_database([15, 2, 1])
+
+        res = self.client().get('/questions?category=Category1')
         data = json.loads(res.data)
         message = self.check_if_operation_was_successful_and_get_payload(data)
         print(message['questions'])
         self.assertEqual(10, len(message['questions']))
 
     def test_get_questions_returns_less_than_10_questions_on_last_page(self):
+        self.add_data_to_database([15, 2, 1])
+
         res = self.client().get('/questions?page=2')
         data = json.loads(res.data)
         message = self.check_if_operation_was_successful_and_get_payload(data)
 
-        self.assertEqual(9, len(message['questions']))
+        self.assertEqual(8, len(message['questions']))
 
     def test_get_questions_with_category_returns_error404_if_page_request_is_out_of_bounds(self):
-        res = self.client().get('/questions?category=Science&page=1000')
+        res = self.client().get('/questions?category=Category1&page=1000')
         data = json.loads(res.data)
         self.check_if_operation_failed_with_error_code(data, 404)
 
@@ -115,6 +135,29 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().get('/questions?category=BadCategory')
         data = json.loads(res.data)
         self.check_if_operation_failed_with_error_code(data, 404)
+
+    def test_delete_question_with_invalid_id_returns_error404(self):
+        res = self.client().delete('/questions/1000')
+        data = json.loads(res.data)
+        self.check_if_operation_failed_with_error_code(data, 404)
+
+    def test_delete_question_with_valid_id_removes_question_from_options(self):
+        self.add_data_to_database([5, 2, 1])
+
+        res = self.client().get('/questions?category=Category1')
+        data = json.loads(res.data)
+        message = self.check_if_operation_was_successful_and_get_payload(data)
+        id = message['questions'][0]['id']
+
+        res = self.client().delete('/questions/' + str(id))
+        data = json.loads(res.data)
+        message2 = self.check_if_operation_was_successful_and_get_payload(data)
+        self.assertEqual(id, message2['question']['id'])
+
+        res = self.client().get('/questions?category=Category1')
+        data = json.loads(res.data)
+        message3 = self.check_if_operation_was_successful_and_get_payload(data)
+        self.assertEqual(message['question_count']-1, message3['question_count'])
 
 
 # Make the tests conveniently executable
