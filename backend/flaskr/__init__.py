@@ -15,11 +15,6 @@ def create_app(test_config=None):
     setup_db(app, 'postgresql://localhost:5432/trivia')
     cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-    '''
-    @TODO: Use the after_request decorator to set Access-Control-Allow
-    Balazs: Is this what they want???
-    '''
-
     @app.after_request
     def after_request(response):
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
@@ -54,10 +49,10 @@ def create_app(test_config=None):
         page = request.args.get('page', 1, type=int)
         category = request.args.get('category', 'all', type=str)
 
-        if (category == 'all'):
+        if category == 'all':
             questions = Question.query.all()
         else:
-            if (Category.query.filter(Category.type == category).count() == 0):
+            if Category.query.filter(Category.type == category).count() == 0:
                 abort(404)
             category_id = Category.query.filter(Category.type == category).first().id
             questions = Question.query.filter(Question.category == category_id).all()
@@ -136,19 +131,6 @@ def create_app(test_config=None):
 
     '''
     @TODO: 
-    Create a GET endpoint to get questions based on category. 
-  
-    TEST: In the "List" tab / main screen, clicking on one of the 
-    categories in the left column will cause only questions of that 
-    category to be shown. 
-    '''
-
-    @app.route('/questions/<category_ID>', methods=['GET'])
-    def get_questions_in_category(category_ID):
-        abort(501)
-
-    '''
-    @TODO: 
     Create a POST endpoint to get questions to play the quiz. 
     This endpoint should take category and previous question parameters 
     and return a random questions within the given category, 
@@ -160,8 +142,31 @@ def create_app(test_config=None):
     '''
 
     @app.route('/', methods=['POST'])
-    def ask_question():
-        abort(501)
+    def play():
+        data = request.json
+
+        if 'previous_questions' not in data:
+            previous_questions = []
+        else:
+            previous_questions = data['previous_questions']
+
+        if 'category' not in data:
+            questions = Question.query.all()
+        else:
+            if Category.query.filter(Category.type == data['category']).count() == 0:
+                abort(404)
+            category_id = Category.query.filter(Category.type == data['category']).first().id
+            questions = Question.query.filter(Question.category == category_id).all()
+
+        unused_questions = []
+        for question in questions:
+            if question.id not in previous_questions:
+                unused_questions.append(question)
+
+        if len(unused_questions) == 0:
+            abort(404)
+
+        return get_response(random.choice(unused_questions).format())
 
     @app.errorhandler(404)
     def not_found(error):

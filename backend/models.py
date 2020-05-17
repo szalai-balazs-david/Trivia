@@ -48,7 +48,7 @@ class Question(db.Model):
   def delete(self):
     db.session.delete(self)
     db.session.commit()
-
+#TODO: category name should be returned instead of category ID
   def format(self):
     return {
       'id': self.id,
