@@ -12,7 +12,7 @@ QUESTIONS_PER_PAGE = 10
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
-    setup_db(app, 'postgresql://localhost:5432/trivia')
+    #setup_db(app, 'postgresql://localhost:5432/trivia')
     cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     @app.after_request
