@@ -3,13 +3,14 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
+    # ToDo: Generate proper secret key
     SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious_secret_key')
     DEBUG = False
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///database.db'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost:5432/trivia'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

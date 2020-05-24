@@ -30,12 +30,14 @@ def create_new_question(question, answer, category, difficulty):
         # return response_object, 409
 
 
-def get_random_question(used_questions=[], category='all'):
+def get_random_question(used_questions=None, category='all'):
+    if used_questions is None:
+        used_questions = []
     if category == 'all':
-        questions = Question.query.filter_by(Question.id not in used_questions).all()
+        questions = Question.query.filter(~Question.id.in_(used_questions)).all()
     else:
-        questions = Question.query.filter_by(Question.category == category)\
-            .filter_by(Question.id not in used_questions).all()
+        questions = Question.query.filter(Question.category == category) \
+            .filter(~Question.id.in_(used_questions)).all()
     if len(questions) <= 0:
         # TODO: Handle this
         pass

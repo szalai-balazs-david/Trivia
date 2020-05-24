@@ -11,7 +11,7 @@ _result = PlayDto.play_result
 
 @api.route('/')
 class Play(Resource):
-    @api.response(201, 'User successfully created.')
+    @api.response(200, 'Success.')
     @api.doc('get a question to play trivia')
     @api.expect(_request, validate=True)
     @api.marshal_with(_result)

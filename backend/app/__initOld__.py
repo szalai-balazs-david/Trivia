@@ -6,6 +6,8 @@ import random
 
 from models import setup_db, Question, Category, db
 
+# ToDo: Obsolete, delete
+
 QUESTIONS_PER_PAGE = 10
 
 

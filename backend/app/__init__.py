@@ -5,6 +5,7 @@ from .main.controller.question_controller import api as question_ns
 
 blueprint = Blueprint('api', __name__)
 
+# ToDo: Add proper title and desc
 api = Api(blueprint,
           title='TITLE',
           version='1.0',

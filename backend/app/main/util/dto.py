@@ -16,10 +16,10 @@ class PlayDto:
     api = Namespace('play', description='operations related to questions')
     play_request = api.model('play', {
         'category': fields.String(default='all', description='category of the game'),
-        'previous_questions': fields.List(fields.Integer, description='questions already asked')
+        'previous_questions': fields.List(fields.Integer, default=[], description='questions already asked')
     })
     play_result = api.model('questions', {
-        'public_id': fields.Integer(required=True, description='question identifier'),
+        'public_id': fields.Integer(required=True, attribute=lambda x: x.id, description='question identifier'),
         'question': fields.String(required=True, description='trivia question'),
         'answer': fields.String(required=True, description='trivia answer'),
         'category': fields.String(required=True, description='question category'),
