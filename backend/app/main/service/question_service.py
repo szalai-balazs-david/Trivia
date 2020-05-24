@@ -1,5 +1,5 @@
 from app.main import db
-from app.main.model.Question import Question
+from app.main.models import Question
 import random
 
 

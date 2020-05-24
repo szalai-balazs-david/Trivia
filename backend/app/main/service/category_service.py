@@ -1,5 +1,5 @@
 from app.main import db
-from app.main.model.Category import Category
+from app.main.models import Category
 
 
 def create_new_category(name):
