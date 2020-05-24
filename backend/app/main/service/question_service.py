@@ -1,5 +1,5 @@
 from app.main import db
-from app.main.models import Question
+from app.main.models import Question, Category
 import random
 
 
@@ -36,12 +36,13 @@ def get_random_question(used_questions=None, category='all'):
     if category == 'all':
         questions = Question.query.filter(~Question.id.in_(used_questions)).all()
     else:
-        questions = Question.query.filter(Question.category == category) \
+        cat_id = Category.query.filter(Category.type == category).first().id
+        questions = Question.query.filter(Question.category_id == cat_id) \
             .filter(~Question.id.in_(used_questions)).all()
     if len(questions) <= 0:
         # TODO: Handle this
         pass
-    return random.choice(questions)
+    return {'data': random.choice(questions)}
 
 
 def delete(data):

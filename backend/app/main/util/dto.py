@@ -22,8 +22,13 @@ class PlayDto:
         'public_id': fields.Integer(required=True, attribute=lambda x: x.id, description='question identifier'),
         'question': fields.String(required=True, description='trivia question'),
         'answer': fields.String(required=True, description='trivia answer'),
-        'category': fields.String(required=True, description='question category'),
+        'category': fields.String(required=True, attribute=lambda x: x.cat.type, description='question category'),
         'difficulty': fields.String(required=True, description='question difficulty')
+    })
+    play_response = api.model('questions', {
+        'success': fields.Boolean(default=True),
+        'error': fields.String(default=''),
+        'data': fields.Nested(play_result)
     })
 
 

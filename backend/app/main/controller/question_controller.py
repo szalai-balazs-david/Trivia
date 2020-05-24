@@ -6,7 +6,7 @@ from app.main.service.question_service import create_new_question, delete, get_r
 
 api = PlayDto.api
 _request = PlayDto.play_request
-_result = PlayDto.play_result
+_result = PlayDto.play_response
 
 
 @api.route('/')
