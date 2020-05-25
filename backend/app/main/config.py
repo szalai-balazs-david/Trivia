@@ -2,9 +2,9 @@ import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+
 class Config:
-    # ToDo: Generate proper secret key
-    SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious_secret_key')
+    SECRET_KEY = os.urandom(32)
     DEBUG = False
 
 

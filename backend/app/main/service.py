@@ -42,7 +42,6 @@ def get_questions(page, category):
     if category == 'all':
         questions = Question.query.all()
     else:
-        # ToDo: Check if I can optimize this
         if Category.query.filter(Category.type == category).count() == 0:
             abort(404)
         category_id = Category.query.filter(Category.type == category).first().id
