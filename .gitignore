@@ -11,3 +11,4 @@ venv
 .Trashes
 ehthumbs.db
 Thumbs.db
+/backend/app/test/test.db
