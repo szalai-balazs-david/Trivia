@@ -18,7 +18,7 @@ api.add_namespace(question_ns, path='/play')
 
 @api.errorhandler(exceptions.NotFound)
 def not_found(error):
-    return get_response("Not found", False, 404), 404
+    return get_response('Not found', False, 404), 404
 
 
 @api.errorhandler(exceptions.UnprocessableEntity)

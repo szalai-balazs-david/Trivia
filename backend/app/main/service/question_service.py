@@ -1,7 +1,7 @@
 from app.main import db
 from app.main.models import Question, Category
 from app.main.util.dto import get_response
-from flask import abort
+from flask_restplus import abort
 import random
 
 
@@ -42,7 +42,7 @@ def get_random_question(used_questions=None, category='all'):
         questions = Question.query.filter(Question.category_id == cat_id) \
             .filter(~Question.id.in_(used_questions)).all()
     if len(questions) <= 0:
-        abort(404)
+        abort(422)
     return get_response(random.choice(questions))# {'data': random.choice(questions)}
 
 
