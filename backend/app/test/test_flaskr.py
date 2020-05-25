@@ -4,28 +4,25 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 from flask import jsonify
 
-from flaskr import create_app
-from models import setup_db, Question, Category
-
+from app.main import create_app
+from app.main.models import Question, Category
+from app.main import db
 
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
 
     def setUp(self):
         """Define test variables and initialize app."""
-        self.app = create_app()
+        self.app = create_app('test')
         self.client = self.app.test_client
-        self.database_name = "trivia_test"
-        #self.database_path = "postgres://{}/{}".format('localhost:5432', self.database_name)
-        self.database_path = "sqlite:///database.db"
-        setup_db(self.app, self.database_path)
 
         # binds the app to the current context
         with self.app.app_context():
             self.db = SQLAlchemy()
             self.db.init_app(self.app)
             # create all tables
-            self.db.create_all()
+            db.create_all()
+            db.session.commit()
 
             self.db.session.query(Question).delete()
             self.db.session.query(Category).delete()
@@ -50,11 +47,16 @@ class TriviaTestCase(unittest.TestCase):
             self.db.init_app(self.app)
 
             for i in range(len(categories_and_questions)):
-                cat = Category("Category" + str(i+1))
+                cat = Category()
+                cat.type = "Category" + str(i+1)
                 self.db.session.add(cat)
                 self.db.session.commit()
                 for j in range(categories_and_questions[i]):
-                    question = Question("Question" + str(i) + "." + str(j), "Answer" + str(i) + "." + str(j), cat.id, 1)
+                    question = Question()
+                    question.question = "Question" + str(i) + "." + str(j)
+                    question.answer = "Answer" + str(i) + "." + str(j)
+                    question.category_id = cat.id
+                    question.difficulty = 1
                     self.db.session.add(question)
             self.db.session.commit()
 
@@ -103,7 +105,7 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
         message = self.check_if_operation_was_successful_and_get_payload(data)
 
-        self.assertEqual(4, message['question_count'])
+        self.assertEqual(1, message['question_count'])
 
     def test_get_questions_returns_10_questions_if_possible(self):
         self.add_data_to_database([15, 2, 1])
@@ -154,7 +156,7 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().delete('/questions/' + str(id))
         data = json.loads(res.data)
         message2 = self.check_if_operation_was_successful_and_get_payload(data)
-        self.assertEqual(id, message2['question']['id'])
+        self.assertEqual(str(id), message2['question'])
 
         res = self.client().get('/questions?category=Category1')
         data = json.loads(res.data)
@@ -168,13 +170,13 @@ class TriviaTestCase(unittest.TestCase):
             'question': 'quest',
             'answer': 'ans',
             'category': 'Category1',
-            'difficulty': 1})
+            'difficulty': "1"})
         data = json.loads(res.data)
 
         res = self.client().get('/questions?category=Category1')
         data = json.loads(res.data)
         message = self.check_if_operation_was_successful_and_get_payload(data)
-        self.assertEqual(9, message['question_count'])
+        self.assertEqual(6, message['question_count'])
         self.assertEqual('ans', message['questions'][5]['answer'])
         self.assertEqual('quest', message['questions'][5]['question'])
         self.assertEqual(1, message['questions'][5]['difficulty'])
@@ -196,6 +198,7 @@ class TriviaTestCase(unittest.TestCase):
             'question': 'quest',
             'category': 'Category1',
             'difficulty': 1})
+        print(res.data)
         data = json.loads(res.data)
         self.check_if_operation_failed_with_error_code(data, 422)
 

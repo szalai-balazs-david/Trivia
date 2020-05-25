@@ -1,18 +1,19 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
+from flask_cors import CORS
 
 from app.main.config import config_by_name
-from app.main.util.dto import get_response
 
 db = SQLAlchemy()
-flask_bcrypt = Bcrypt()
 
 
 def create_app(config_name):
+    from app.main.models import Question, Category
+    from app.main.controller import app as blueprint
     app = Flask(__name__)
     app.config.from_object(config_by_name[config_name])
     db.init_app(app)
-    flask_bcrypt.init_app(app)
+    app.register_blueprint(blueprint)
+    cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     return app
