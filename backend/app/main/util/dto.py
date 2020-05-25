@@ -1,6 +1,14 @@
 from flask_restplus import Namespace, fields
 
 
+def get_response(data, success=True, error=0):
+    return {
+        "success": success,
+        "error": error,
+        "message": data
+    }
+
+
 class QuestionDto:
     api = Namespace('questions', description='operations related to questions')
     question = api.model('questions', {
@@ -28,7 +36,7 @@ class PlayDto:
     play_response = api.model('questions', {
         'success': fields.Boolean(default=True),
         'error': fields.String(default=''),
-        'data': fields.Nested(play_result)
+        'message': fields.Nested(play_result)
     })
 
 
