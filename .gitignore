@@ -12,3 +12,4 @@ venv
 ehthumbs.db
 Thumbs.db
 /backend/app/test/test.db
+node_modules
