@@ -22,18 +22,12 @@ pip install -r requirements.txt
 
 This will install all of the required packages we selected within the `requirements.txt` file.
 
-##### Key Dependencies
-
-- [Flask](http://flask.pocoo.org/)  is a lightweight backend microservices framework. Flask is required to handle requests and responses.
-
-- [SQLAlchemy](https://www.sqlalchemy.org/) is the Python SQL toolkit and ORM we'll use handle the lightweight sqlite database. You'll primarily work in app.py and can reference models.py. 
-
-- [Flask-CORS](https://flask-cors.readthedocs.io/en/latest/#) is the extension we'll use to handle cross origin requests from our frontend server. 
-
 ## Database Setup
-With Postgres running, restore a database using the trivia.psql file provided. From the backend folder in terminal run:
+From within the `backend` directory first ensure you are working using your created virtual environment.
+
+With Postgres running, initialize the database using migrations. In terminal run:
 ```bash
-psql trivia < trivia.psql
+python manage.py db upgrade
 ```
 
 ## Running the server
@@ -43,28 +37,115 @@ From within the `backend` directory first ensure you are working using your crea
 To run the server, execute:
 
 ```bash
-export FLASK_APP=flaskr
-export FLASK_ENV=development
-flask run
+python manage.py run
 ```
 
-Setting the `FLASK_ENV` variable to `development` will detect file changes and restart the server automatically.
+Setting the `TRIVIA_ENV` variable to `dev` will detect file changes and restart the server automatically.
 
-Setting the `FLASK_APP` variable to `flaskr` directs flask to use the `flaskr` directory and the `__init__.py` file to find the application. 
+## API description
 
-## Tasks
+#### Endpoints
 
-One note before you delve into your tasks: for each endpoint you are expected to define the endpoint and response data. The frontend will be a plentiful resource because it is set up to expect certain endpoints and response data formats already. You should feel free to specify endpoints in your own way; if you do so, make sure to update the frontend or you will get some unexpected behavior. 
+1. GET '/categories'
+2. GET '/questions'
+3. DELETE '/questions/<question_id>'
+4. POST '/questions'
+5. POST '/questions/search'
+6. POST '/'
 
-1. Use Flask-CORS to enable cross-domain requests and set response headers. 
-2. Create an endpoint to handle GET requests for questions, including pagination (every 10 questions). This endpoint should return a list of questions, number of total questions, current category, categories. 
-3. Create an endpoint to handle GET requests for all available categories. 
-4. Create an endpoint to DELETE question using a question ID. 
-5. Create an endpoint to POST a new question, which will require the question and answer text, category, and difficulty score. 
-6. Create a POST endpoint to get questions based on category. 
-7. Create a POST endpoint to get questions based on a search term. It should return any questions for whom the search term is a substring of the question. 
-8. Create a POST endpoint to get questions to play the quiz. This endpoint should take category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions. 
-9. Create error handlers for all expected errors including 400, 404, 422 and 500. 
+#### Responses
+
+All endpoints return JSON messages with the following structure:
+```json
+{
+    "success": true,
+    "error": 0,
+    "message": "<see description of the actual endpoint>"
+}
+```
+
+For all HTTP error the following response is expected (using 404 as illustration):
+```json
+{
+    "success": false,
+    "error": 404,
+    "message": "Message describing the error"
+}
+```
+
+#### GET '/categories'
+
+Description: Get the names of all available categories.
+
+Parameters: None
+
+Expected result:
+```json
+{
+    "success": true,
+    "error": 0,
+    "message": 
+    [
+        "Category name 1",
+        "Category name 2"
+    ]
+}
+```
+
+Errors: None
+
+#### GET '/questions'
+
+Description: Get a list of questions, including pagination (10 per page) and category selection.
+
+Parameters: 
+1. page: select which page to retrieve. (1 based)
+    - Default: 1
+2. category: string based name of category to retrieve OR "all" to retrieve all categories
+    - Default: "all"
+
+Expected result:
+```json
+{
+    "success": true,
+    "error": 0,
+    "message": 
+    {
+        "current category": "category name / all",
+        "categories":
+            [
+                "Category name 1",
+                "Category name 2"
+            ],
+        "question_count": 123,
+        "questions":
+        [
+            {
+                "id": 1,
+                "question": "What's up?",
+                "answer": "Not much",
+                "difficulty": 1,
+                "category": "Category name 1"
+            },
+            {
+                "id": 2,
+                "question": "Who is a good boy?",
+                "answer": "I am!",
+                "difficulty": 1,
+                "category": "Category name 1"
+            }
+        ]
+    }
+}
+```
+
+#### DELETE '/questions/<question_id>'
+
+#### POST '/questions'
+
+#### POST '/questions/search'
+
+#### POST '/'
 
 REVIEW_COMMENT
 ```
@@ -92,9 +173,11 @@ GET '/categories'
 
 ## Testing
 To run the tests, run
-```
-dropdb trivia_test
-createdb trivia_test
-psql trivia_test < trivia.psql
-python test_flaskr.py
+
+From within the `backend` directory first ensure you are working using your created virtual environment.
+
+To run the server, execute:
+
+```bash
+python manage.py test
 ```

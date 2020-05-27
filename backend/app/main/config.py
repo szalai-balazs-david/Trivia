@@ -10,7 +10,7 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost:5432/trivia'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost:5432/trivia2'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
@@ -24,7 +24,7 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost:5432/trivia'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost:5432/trivia2'
 
 
 config_by_name = dict(

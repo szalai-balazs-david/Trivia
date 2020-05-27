@@ -6,7 +6,7 @@ from flask_script import Manager
 
 from app.main import create_app, db
 
-app = create_app(os.getenv('TRIVIA_ENV') or 'dev')
+app = create_app(os.getenv('TRIVIA_ENV') or 'prod')
 
 app.app_context().push()
 
