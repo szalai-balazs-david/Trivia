@@ -20,6 +20,29 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE,OPTIONS')
     return response
 
+# ToDo: implement
+@app.route('/users', methods=['GET'])
+def app_get_users():
+    abort(501)
+
+
+# ToDo: implement
+@app.route('/users', methods=['POST'])
+def app_create_user():
+    abort(501)
+
+
+# ToDo: implement
+@app.route('/questions', methods=['UPDATE'])
+def app_update_question():
+    abort(501)
+
+
+# ToDo: implement
+@app.route('/users', methods=['UPDATE'])
+def app_update_user():
+    abort(501)
+
 
 @app.route('/categories', methods=['GET'])
 def app_get_categories():

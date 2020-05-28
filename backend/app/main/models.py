@@ -13,7 +13,7 @@ class Question(db.Model):
     __tablename__ = 'questions'
 
     id = db.Column(db.Integer, primary_key=True)
-    question = db.Column(db.String, nullable=False)
+    question = db.Column(db.String, nullable=False, unique=True)
     answer = db.Column(db.String, nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     difficulty = db.Column(db.Integer, nullable=False)
