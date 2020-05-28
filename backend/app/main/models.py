@@ -17,3 +17,13 @@ class Question(db.Model):
     answer = db.Column(db.String, nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     difficulty = db.Column(db.Integer, nullable=False)
+    answer_attempt_count = db.Column(db.Integer, nullable=False)
+    answer_success_count = db.Column(db.Integer, nullable=False)
+
+
+class User(db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    questions_total = db.Column(db.Integer, nullable=False)
+    questions_won = db.Column(db.Integer, nullable=False)
