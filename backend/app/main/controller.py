@@ -3,6 +3,7 @@ from flask import request, abort, Blueprint
 from app.main.util import get_response
 from app.main.service import \
     get_categories, \
+    create_new_category, \
     get_random_question, \
     get_questions, \
     delete_question, \
@@ -23,6 +24,15 @@ def after_request(response):
 @app.route('/categories', methods=['GET'])
 def app_get_categories():
     return get_categories()
+
+
+@app.route('/categories', methods=['POST'])
+def app_create_category():
+    data = request.json
+    if 'name' not in data:
+        abort(422)
+
+    return create_new_category(data['name'])
 
 
 @app.route('/questions', methods=['GET'])

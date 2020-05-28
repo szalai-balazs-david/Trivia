@@ -38,6 +38,11 @@ def verify_category_exists(category):
         abort(404)
 
 
+def verify_does_not_category_exists(category):
+    if Category.query.filter(Category.type == category).count() > 0:
+        abort(422)
+
+
 def get_questions(page, category):
     if category == 'all':
         questions = Question.query.all()
@@ -86,6 +91,18 @@ def create_new_question(question, answer, category, difficulty):
 
     return get_response({
         'question': serialize_question(new_question)
+    })
+
+
+def create_new_category(name):
+    verify_does_not_category_exists(name)
+
+    new_category = Category()
+    new_category.type = name
+    save(new_category)
+
+    return get_response({
+        'category': name
     })
 
 

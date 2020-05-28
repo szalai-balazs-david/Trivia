@@ -60,11 +60,12 @@ Note: All tests are running against an SQLite database, therefore the test datab
 #### Endpoints
 
 1. GET '/categories'
-2. GET '/questions'
-3. DELETE '/questions/<question_id>'
-4. POST '/questions'
-5. POST '/questions/search'
-6. POST '/'
+2. POST '/categories'
+3. GET '/questions'
+4. DELETE '/questions/<question_id>'
+5. POST '/questions'
+6. POST '/questions/search'
+7. POST '/'
 
 Note: The original requirements asked for an additional endpoint to query questions based on category. It seemed like a duplication of the GET '/questions' endpoint, therefore I didn't implement it.
 
@@ -108,6 +109,32 @@ Expected result:
 ```
 
 Errors: None
+
+#### POST '/categories'
+
+Description: Create a new category.
+
+Parameters: 
+1. name: 
+    - String
+    - Name of the new category
+    - Required
+
+Expected result:
+```json
+{
+    "success": true,
+    "error": 0,
+    "message": 
+    {
+        "category": "Category Name"
+    }
+}
+```
+
+Errors:
+1. Missing required parameter: ERROR 422
+2. Category name already exists in database: ERROR 422
 
 #### GET '/questions'
 
@@ -304,3 +331,8 @@ Expected result:
     }
 }
 ```
+
+## Credits
+
+Though I did not end up using Flask-RESTPlus for the project, I borrowed some of the implementation details from this tutorial:
+https://www.freecodecamp.org/news/structuring-a-flask-restplus-web-service-for-production-builds-c2ec676de563/
