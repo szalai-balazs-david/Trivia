@@ -34,7 +34,6 @@ def serialize_questions(question):
 
 
 def verify_category_exists(category):
-    print(category)
     if Category.query.filter(Category.type == category).count() != 1:
         abort(404)
 

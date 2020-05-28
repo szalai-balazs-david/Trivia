@@ -23,7 +23,9 @@ pip install -r requirements.txt
 This will install all of the required packages we selected within the `requirements.txt` file.
 
 ## Database Setup
-From within the `backend` directory first ensure you are working using your created virtual environment.
+From within the `backend` directory first ensure that:
+1. You are working using your created virtual environment
+2. You have a database called `trivia` created (See config.py for details about the connection string.)
 
 With Postgres running, initialize the database using migrations. In terminal run:
 ```bash
@@ -42,6 +44,17 @@ python manage.py run
 
 Setting the `TRIVIA_ENV` variable to `dev` will detect file changes and restart the server automatically.
 
+## Testing
+From within the `backend` directory first ensure you are working using your created virtual environment.
+
+To run the server, execute:
+
+```bash
+python manage.py test
+```
+
+Note: All tests are running against an SQLite database, therefore the test database is no longer necessary.
+
 ## API description
 
 #### Endpoints
@@ -52,6 +65,8 @@ Setting the `TRIVIA_ENV` variable to `dev` will detect file changes and restart 
 4. POST '/questions'
 5. POST '/questions/search'
 6. POST '/'
+
+Note: The original requirements asked for an additional endpoint to query questions based on category. It seemed like a duplication of the GET '/questions' endpoint, therefore I didn't implement it.
 
 #### Responses
 
@@ -99,9 +114,13 @@ Errors: None
 Description: Get a list of questions, including pagination (10 per page) and category selection.
 
 Parameters: 
-1. page: select which page to retrieve. (1 based)
+1. page: 
+    - Int
+    - Select which page to retrieve. (1 based)
     - Default: 1
-2. category: string based name of category to retrieve OR "all" to retrieve all categories
+2. category: 
+    - String
+    - String based name of category to retrieve OR "all" to retrieve all categories
     - Default: "all"
 
 Expected result:
@@ -111,12 +130,12 @@ Expected result:
     "error": 0,
     "message": 
     {
-        "current category": "category name / all",
+        "current_category": "category name / all",
         "categories":
-            [
-                "Category name 1",
-                "Category name 2"
-            ],
+        [
+            "Category name 1",
+            "Category name 2"
+        ],
         "question_count": 123,
         "questions":
         [
@@ -139,45 +158,149 @@ Expected result:
 }
 ```
 
+Errors:
+1. Category does not exist: ERROR 404
+2. No questions on selected page: ERROR 404
+
 #### DELETE '/questions/<question_id>'
+
+Description: Delete a question byu question ID.
+
+Parameters: None
+
+Expected result:
+```json
+{
+    "success": true,
+    "error": 0,
+    "message": 
+    {
+        "question": 12
+    }
+}
+```
+
+Errors:
+1. QuestionID does not exist: ERROR 404
 
 #### POST '/questions'
 
+Description: Create a new question.
+
+Parameters: 
+1. question: 
+    - String
+    - The question
+    - Required
+2. answer: 
+    - String
+    - the answer to the question
+    - Required
+3. category:
+    - String 
+    - Name of category to which the question belongs to
+    - Required
+4. difficulty: 
+    - Int
+    - Difficulty level
+    - Required
+
+Expected result:
+```json
+{
+    "success": true,
+    "error": 0,
+    "message": 
+    {
+        "question": 
+        {
+            "id": 1,
+            "question": "What's up?",
+            "answer": "Not much",
+            "difficulty": 1,
+            "category": "Category name 1"
+        }
+    }
+}
+```
+
+Errors:
+1. Any of the parameters missing: ERROR 422
+2. Category name not found in database: ERROR 404
+
 #### POST '/questions/search'
+
+Description: Search existing questions.
+
+Parameters: 
+1. search_term:
+    - String
+    - Search term to be used on the questions
+    - Required
+2. page: 
+    - Int
+    - Select which page to retrieve. (1 based)
+    - Default: 1
+
+Expected result:
+```json
+{
+    "success": true,
+    "error": 0,
+    "message": 
+    {
+        "question_count": 123,
+        "questions":
+        [
+            {
+                "id": 1,
+                "question": "What's up?",
+                "answer": "Not much",
+                "difficulty": 1,
+                "category": "Category name 1"
+            },
+            {
+                "id": 2,
+                "question": "Who is a good boy?",
+                "answer": "I am!",
+                "difficulty": 1,
+                "category": "Category name 1"
+            }
+        ]
+    }
+}
+```
+
+Errors:
+1. Required parameter missing: ERROR 422
+2. No questions on selected page: ERROR 404
 
 #### POST '/'
 
-REVIEW_COMMENT
-```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
+Description: Play Trivia.
 
-Endpoints
-GET '/categories'
-GET ...
-POST ...
-DELETE ...
+Parameters: 
+1. previous_questions:
+    - [] of Int
+    - Question IDs already used
+    - Default: empty
+2. category: 
+    - String
+    - Name of category for the game or "all" for using questions of all categories
+    - Default: "all"
 
-GET '/categories'
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, categories, that contains a object of id: category_string key:value pairs. 
-{'1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
-'6' : "Sports"}
-
-```
-
-
-## Testing
-To run the tests, run
-
-From within the `backend` directory first ensure you are working using your created virtual environment.
-
-To run the server, execute:
-
-```bash
-python manage.py test
+Expected result:
+```json
+{
+    "success": true,
+    "error": 0,
+    "message": 
+    {
+        "id": 2,
+        "question": "Who is a good boy?",
+        "answer": "I am!",
+        "difficulty": 1,
+        "category": "Category name 1"
+    }
+}
 ```

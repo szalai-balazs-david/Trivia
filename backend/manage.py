@@ -19,6 +19,7 @@ manager.add_command('db', MigrateCommand)
 
 @manager.command
 def run():
+    """Runs the API."""
     app.run()
 
 
