@@ -79,6 +79,8 @@ def delete_question(question_id):
 
 def create_new_question(question, answer, category, difficulty):
     verify_category_exists(category)
+    if difficulty not in [1, 2, 3, 4, 5]:
+        abort(422, "difficulty must be an integer between 1-5")
 
     cat_id = Category.query.filter(Category.type == category).first().id
 

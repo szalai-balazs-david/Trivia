@@ -228,7 +228,7 @@ Parameters:
     - Name of category to which the question belongs to
     - Required
 4. difficulty: 
-    - Int
+    - Int, 1-5
     - Difficulty level
     - Required
 

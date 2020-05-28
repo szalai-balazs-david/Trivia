@@ -11,7 +11,7 @@ class CreateQuestionTestCase(BaseTestClass):
             'question': 'quest',
             'answer': 'ans',
             'category': 'Category1',
-            'difficulty': "1"})
+            'difficulty': 1})
         data = json.loads(res.data)
 
         res = self.client().get('/questions?category=Category1')
@@ -72,3 +72,14 @@ class CreateQuestionTestCase(BaseTestClass):
             'difficulty': 1})
         data = json.loads(res.data)
         self.check_if_operation_failed_with_error_code(data, 404)
+
+    def test_create_question_if_difficulty_out_of_range_then_throws_422(self):
+        self.add_data_to_database([5, 2, 1])
+
+        res = self.client().post('/questions', json={
+            'question': 'quest',
+            'answer': 'ans',
+            'category': 'Category1',
+            'difficulty': 0})
+        data = json.loads(res.data)
+        self.check_if_operation_failed_with_error_code(data, 422)
