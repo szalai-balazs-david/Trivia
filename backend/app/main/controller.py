@@ -8,7 +8,10 @@ from app.main.service import \
     get_questions, \
     delete_question, \
     create_new_question, \
-    search_for_question
+    search_for_question, \
+    create_new_user, \
+    get_users, \
+    add_result
 
 
 app = Blueprint('default', __name__)
@@ -20,28 +23,32 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE,OPTIONS')
     return response
 
-# ToDo: implement
+
 @app.route('/users', methods=['GET'])
 def app_get_users():
-    abort(501)
+    return get_users()
 
 
-# ToDo: implement
 @app.route('/users', methods=['POST'])
 def app_create_user():
-    abort(501)
+    data = request.json
+    if 'name' not in data:
+        abort(422)
+
+    return create_new_user(data['name'])
 
 
-# ToDo: implement
-@app.route('/questions', methods=['UPDATE'])
-def app_update_question():
-    abort(501)
+@app.route('/results', methods=['POST'])
+def app_add_results():
+    data = request.json
+    if 'user_id' not in data:
+        abort(422)
+    if 'question_id' not in data:
+        abort(422)
+    if 'success' not in data:
+        abort(422)
 
-
-# ToDo: implement
-@app.route('/users', methods=['UPDATE'])
-def app_update_user():
-    abort(501)
+    return add_result(data['user_id'], data['question_id'], data['success'])
 
 
 @app.route('/categories', methods=['GET'])

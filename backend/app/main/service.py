@@ -1,5 +1,5 @@
 from app.main import db
-from app.main.models import Question, Category
+from app.main.models import Question, Category, User
 from app.main.util import get_response
 from flask import abort, jsonify
 import random
@@ -16,6 +16,22 @@ def get_categories():
     return get_response(get_categories_as_list())
 
 
+def serialize_user(user):
+    return {
+            'id': user.id,
+            'name': user.name,
+            'questions_answered': user.questions_total,
+            'correct_answers': user.questions_won
+        }
+
+
+def get_users():
+    data = []
+    for user in User.query.all():
+        data.append(serialize_user(user))
+    return get_response(data)
+
+
 def serialize_question(question):
     return {
         'id': question.id,
@@ -23,6 +39,8 @@ def serialize_question(question):
         'answer': question.answer,
         'difficulty': question.difficulty,
         'category': question.cat.type,
+        'answer_count': question.answer_attempt_count,
+        'correct_answers': question.answer_success_count
     }
 
 
@@ -38,8 +56,23 @@ def verify_category_exists(category):
         abort(404)
 
 
-def verify_does_not_category_exists(category):
+def verify_category_does_not_exists(category):
     if Category.query.filter(Category.type == category).count() > 0:
+        abort(422)
+
+
+def verify_user_does_not_exist(name):
+    if User.query.filter(User.name == name).count() > 0:
+        abort(422)
+
+
+def verify_question_id_exists(question_id):
+    if Question.query.filter(Question.id == question_id).count() != 1:
+        abort(422)
+
+
+def verify_user_id_exist(user_id):
+    if User.query.filter(User.id == user_id).count() != 1:
         abort(422)
 
 
@@ -89,6 +122,8 @@ def create_new_question(question, answer, category, difficulty):
     new_question.answer = answer
     new_question.category_id = cat_id
     new_question.difficulty = difficulty
+    new_question.answer_success_count = 0
+    new_question.answer_attempt_count = 0
     save(new_question)
 
     return get_response({
@@ -96,8 +131,30 @@ def create_new_question(question, answer, category, difficulty):
     })
 
 
+def add_result(user_id, question_id, success):
+    verify_user_id_exist(user_id)
+    verify_question_id_exists(question_id)
+
+    user = User.query.filter(User.id == user_id).first()
+    question = Question.query.filter(Question.id == question_id).first()
+
+    user.questions_total = User.questions_total + 1
+    question.answer_attempt_count = Question.answer_attempt_count + 1
+
+    if success:
+        user.questions_won = User.questions_won + 1
+        question.answer_success_count = Question.answer_success_count + 1
+
+    db.session.commit()
+
+    return get_response({
+        'user': serialize_user(user),
+        'question': serialize_question(question)
+    })
+
+
 def create_new_category(name):
-    verify_does_not_category_exists(name)
+    verify_category_does_not_exists(name)
 
     new_category = Category()
     new_category.type = name
@@ -105,6 +162,20 @@ def create_new_category(name):
 
     return get_response({
         'category': name
+    })
+
+
+def create_new_user(name):
+    verify_user_does_not_exist(name)
+
+    new_user = User()
+    new_user.name = name
+    new_user.questions_total = 0
+    new_user.questions_won = 0
+    save(new_user)
+
+    return get_response({
+        'name': name
     })
 
 

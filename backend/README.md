@@ -66,6 +66,9 @@ Note: All tests are running against an SQLite database, therefore the test datab
 5. POST '/questions'
 6. POST '/questions/search'
 7. POST '/'
+8. GET '/users'
+9. POST '/users'
+10. POST '/results'
 
 Note: The original requirements asked for an additional endpoint to query questions based on category. It seemed like a duplication of the GET '/questions' endpoint, therefore I didn't implement it.
 
@@ -171,14 +174,18 @@ Expected result:
                 "question": "What's up?",
                 "answer": "Not much",
                 "difficulty": 1,
-                "category": "Category name 1"
+                "category": "Category name 1",
+                "answer_count": 1,
+                "correct_answers": 1
             },
             {
                 "id": 2,
                 "question": "Who is a good boy?",
                 "answer": "I am!",
                 "difficulty": 1,
-                "category": "Category name 1"
+                "category": "Category name 1",
+                "answer_count": 1,
+                "correct_answers": 1
             }
         ]
     }
@@ -245,7 +252,9 @@ Expected result:
             "question": "What's up?",
             "answer": "Not much",
             "difficulty": 1,
-            "category": "Category name 1"
+            "category": "Category name 1",
+            "answer_count": 1,
+            "correct_answers": 1
         }
     }
 }
@@ -284,14 +293,18 @@ Expected result:
                 "question": "What's up?",
                 "answer": "Not much",
                 "difficulty": 1,
-                "category": "Category name 1"
+                "category": "Category name 1",
+                "answer_count": 1,
+                "correct_answers": 1
             },
             {
                 "id": 2,
                 "question": "Who is a good boy?",
                 "answer": "I am!",
                 "difficulty": 1,
-                "category": "Category name 1"
+                "category": "Category name 1",
+                "answer_count": 1,
+                "correct_answers": 1
             }
         ]
     }
@@ -327,10 +340,119 @@ Expected result:
         "question": "Who is a good boy?",
         "answer": "I am!",
         "difficulty": 1,
-        "category": "Category name 1"
+        "category": "Category name 1",
+        "answer_count": 1,
+        "correct_answers": 1
     }
 }
 ```
+
+#### GET '/users'
+
+Description: Get a list of registered users.
+
+Parameters: None
+
+Expected result:
+```json
+{
+    "success": true,
+    "error": 0,
+    "message": 
+    [
+        {
+            "id": 1,
+            "name": "Name1",
+            "questions_answered": 1,
+            "correct_answers": 1
+        },
+        {
+            "id": 2,
+            "name": "Name2",
+            "questions_answered": 1,
+            "correct_answers": 1
+        }
+    ]
+}
+```
+
+Errors: None
+
+#### POST '/users'
+
+Description: Create a new user.
+
+Parameters: 
+1. name: 
+    - String
+    - Name of the new user
+    - Required
+
+Expected result:
+```json
+{
+    "success": true,
+    "error": 0,
+    "message": 
+    {
+        "name": "New User Name"
+    }
+}
+```
+
+Errors:
+1. Missing required parameter: ERROR 422
+2. User name already exists in database: ERROR 422
+
+#### POST '/results'
+
+Description: Let the API know whether a question was answered sucessfully by a particular user.
+
+Parameters: 
+1. question_id: 
+    - Integer
+    - ID of question that was answered
+    - Required
+2. user_id: 
+    - Integer
+    - ID of user who answered the question
+    - Required
+3. success: 
+    - Boolean
+    - Whether the answer was correct
+    - Required
+
+Expected result:
+```json
+{
+    "success": true,
+    "error": 0,
+    "message": 
+    {
+        "user": 
+        {
+            "id": 2,
+            "name": "Name2",
+            "questions_answered": 1,
+            "correct_answers": 1
+        },
+        "question": 
+        {
+            "id": 2,
+            "question": "Who is a good boy?",
+            "answer": "I am!",
+            "difficulty": 1,
+            "category": "Category name 1",
+            "answer_count": 1,
+            "correct_answers": 1
+        }
+    }
+}
+```
+
+Errors:
+1. Missing required parameter: ERROR 422
+2. Supplied question / user ID does not exist in database: ERROR 422
 
 ## Credits
 
