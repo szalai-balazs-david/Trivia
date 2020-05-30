@@ -144,6 +144,8 @@ class QuestionView extends Component {
               answer={q.answer}
               category={q.category}
               difficulty={q.difficulty}
+              answer_count={q.answer_count}
+              correct_answers={q.correct_answers}
               questionAction={this.questionAction(q.id)}
             />
           ))}
