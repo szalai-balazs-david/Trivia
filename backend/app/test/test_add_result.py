@@ -120,6 +120,32 @@ class AddResultTestCase(BaseTestClass):
         self.assertEqual(user_new['questions_answered'], user_original['questions_answered'] + 1)
         self.assertEqual(user_new['correct_answers'], user_original['correct_answers'])
 
+    def test_add_result_if_user_id_is_neg1_then_no_user_counters_are_incremented(self):
+        self.add_data_to_database([1, 2, 1])
+        self.add_user_to_database([
+            {'name': 'User1', 'wins': 2, 'answers': 5},
+            {'name': 'User2', 'wins': 2, 'answers': 5}])
+
+        user_original = self.get_a_valid_user()
+        question_original = self.get_a_valid_question()
+
+        res = self.client().post('/results', json={
+            'user_id': -1,
+            'question_id': question_original['id'],
+            'success': True})
+        data = json.loads(res.data)
+
+        res = self.client().get('/users')
+        data = json.loads(res.data)
+        message = self.check_if_operation_was_successful_and_get_payload(data)
+        for u in message:
+            if u['id'] == question_original['id']:
+                user_new = u
+                break
+
+        self.assertEqual(user_new['questions_answered'], user_original['questions_answered'])
+        self.assertEqual(user_new['correct_answers'], user_original['correct_answers'])
+
     def test_add_result_if_parameter_user_id_is_missing_then_throws_422(self):
         self.add_data_to_database([1, 2, 1])
         self.add_user_to_database([
@@ -163,7 +189,7 @@ class AddResultTestCase(BaseTestClass):
             {'name': 'User2', 'wins': 2, 'answers': 5}])
 
         res = self.client().post('/results', json={
-            'user_id': -1,
+            'user_id': -2,
             'question_id': self.get_a_valid_question()['id'],
             'success': True})
         data = json.loads(res.data)

@@ -2,10 +2,6 @@ import React, { Component } from 'react';
 import '../stylesheets/Question.css';
 
 class User extends Component {
-  constructor(){
-    super();
-  }
-
   render() {
     const { name, answer_count, correct_answers } = this.props;
     return (
