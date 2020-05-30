@@ -18,11 +18,11 @@ def get_categories():
 
 def serialize_user(user):
     return {
-            'id': user.id,
-            'name': user.name,
-            'questions_answered': user.questions_total,
-            'correct_answers': user.questions_won
-        }
+        'id': user.id,
+        'name': user.name,
+        'questions_answered': user.questions_total,
+        'correct_answers': user.questions_won
+    }
 
 
 def get_users():
@@ -71,8 +71,8 @@ def verify_question_id_exists(question_id):
         abort(422)
 
 
-def verify_user_id_exist(user_id):
-    if User.query.filter(User.id == user_id).count() != 1:
+def verify_user_id_exist_or_neg1(user_id):
+    if User.query.filter(User.id == user_id).count() != 1 and user_id != -1:
         abort(422)
 
 
@@ -132,23 +132,28 @@ def create_new_question(question, answer, category, difficulty):
 
 
 def add_result(user_id, question_id, success):
-    verify_user_id_exist(user_id)
+    print(str(user_id) + ", " + str(question_id) + ", " + str(success))
+    verify_user_id_exist_or_neg1(user_id)
     verify_question_id_exists(question_id)
 
-    user = User.query.filter(User.id == user_id).first()
     question = Question.query.filter(Question.id == question_id).first()
-
-    user.questions_total = User.questions_total + 1
     question.answer_attempt_count = Question.answer_attempt_count + 1
-
     if success:
-        user.questions_won = User.questions_won + 1
         question.answer_success_count = Question.answer_success_count + 1
+
+    if user_id != -1:
+        user = User.query.filter(User.id == user_id).first()
+        user.questions_total = User.questions_total + 1
+        if success:
+            user.questions_won = User.questions_won + 1
+        user_info = serialize_user(user)
+    else:
+        user_info = 'None'
 
     db.session.commit()
 
     return get_response({
-        'user': serialize_user(user),
+        'user': user_info,
         'question': serialize_question(question)
     })
 
@@ -216,4 +221,3 @@ def delete(data):
 def save(data):
     db.session.add(data)
     db.session.commit()
-

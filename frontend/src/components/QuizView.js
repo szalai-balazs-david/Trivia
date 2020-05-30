@@ -62,7 +62,7 @@ class QuizView extends Component {
   }
 
   selectUserNone = () => {
-    this.setState({user_id: 1}, () => this.getNextQuestion());
+    this.setState({user_id: -1}, () => this.getNextQuestion());
   }
 
   handleChange = (event) => {
@@ -107,6 +107,24 @@ class QuizView extends Component {
     event.preventDefault();
     const formatGuess = this.state.guess.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase()
     let evaluate =  this.evaluateAnswer()
+    $.ajax({
+      url: `/results`,
+      type: "POST",
+      dataType: 'json',
+      contentType: 'application/json',
+      data: JSON.stringify({user_id: this.state.user_id, question_id: this.state.currentQuestion.id, success: evaluate}),
+      xhrFields: {
+        withCredentials: true
+      },
+      crossDomain: true,
+      success: (result) => {
+        return;
+      },
+      error: (error) => {
+        alert('Error sending back the results')
+        return;
+      }
+    })
     this.setState({
       numCorrect: !evaluate ? this.state.numCorrect : this.state.numCorrect + 1,
       showAnswer: true,
