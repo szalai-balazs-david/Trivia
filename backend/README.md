@@ -417,12 +417,13 @@ Parameters:
     - Integer
     - ID of user who answered the question
     - Required
+    - Set to -1 if player doesn't want to collect info about him/her
 3. success: 
     - Boolean
     - Whether the answer was correct
     - Required
 
-Expected result:
+Expected result if user ID is provided:
 ```json
 {
     "success": true,
@@ -436,6 +437,28 @@ Expected result:
             "questions_answered": 1,
             "correct_answers": 1
         },
+        "question": 
+        {
+            "id": 2,
+            "question": "Who is a good boy?",
+            "answer": "I am!",
+            "difficulty": 1,
+            "category": "Category name 1",
+            "answer_count": 1,
+            "correct_answers": 1
+        }
+    }
+}
+```
+
+Expected result in Anonymous mode:
+```json
+{
+    "success": true,
+    "error": 0,
+    "message": 
+    {
+        "user": "None",
         "question": 
         {
             "id": 2,
