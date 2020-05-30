@@ -121,7 +121,7 @@ class QuizView extends Component {
         return;
       },
       error: (error) => {
-        alert('Error sending back the results')
+      //Do nothing. No point in disturbing game experience by this.
         return;
       }
     })
