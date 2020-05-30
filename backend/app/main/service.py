@@ -132,7 +132,6 @@ def create_new_question(question, answer, category, difficulty):
 
 
 def add_result(user_id, question_id, success):
-    print(str(user_id) + ", " + str(question_id) + ", " + str(success))
     verify_user_id_exist_or_neg1(user_id)
     verify_question_id_exists(question_id)
 
@@ -146,15 +145,18 @@ def add_result(user_id, question_id, success):
         user.questions_total = User.questions_total + 1
         if success:
             user.questions_won = User.questions_won + 1
-        user_info = serialize_user(user)
-    else:
-        user_info = 'None'
 
     db.session.commit()
 
+    question_info = serialize_question(Question.query.filter(Question.id == question_id).first())
+    if user_id != -1:
+        user_info = serialize_user(User.query.filter(User.id == user_id).first())
+    else:
+        user_info = 'None'
+
     return get_response({
         'user': user_info,
-        'question': serialize_question(question)
+        'question': question_info
     })
 
 

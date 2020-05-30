@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import '../stylesheets/App.css';
 import Question from './Question';
+import User from './User';
 import Search from './Search';
 import $ from 'jquery';
 
@@ -14,11 +15,13 @@ class QuestionView extends Component {
       totalQuestions: 0,
       categories: [],
       currentCategory: 'all',
+      users: [],
     }
   }
 
   componentDidMount() {
     this.getQuestions();
+    this.getUsers();
   }
 
   getQuestions = () => {
@@ -35,6 +38,22 @@ class QuestionView extends Component {
       },
       error: (error) => {
         alert('Unable to load questions. Please try your request again')
+        return;
+      }
+    })
+  }
+
+  getUsers = () => {
+    $.ajax({
+      url: `/users`,
+      type: "GET",
+      success: (result) => {
+        this.setState({
+          users: result.message})
+        return;
+      },
+      error: (error) => {
+        alert('Unable to load users. Please try your request again')
         return;
       }
     })
@@ -152,6 +171,16 @@ class QuestionView extends Component {
           <div className="pagination-menu">
             {this.createPagination()}
           </div>
+        </div>
+        <div className="user-list">
+          <h2>Users</h2>
+          {this.state.users.map((u, ind) => (
+            <User
+              name={u.name}
+              answer_count={u.questions_answered}
+              correct_answers={u.correct_answers}
+            />
+          ))}
         </div>
 
       </div>
