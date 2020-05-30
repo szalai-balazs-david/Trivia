@@ -13,9 +13,11 @@ class QuizView extends Component {
         previousQuestions: [], 
         showAnswer: false,
         categories: [],
+        users: [],
         numCorrect: 0,
         currentQuestion: {},
         guess: '',
+        user_id: null,
         forceEnd: false
     }
   }
@@ -33,14 +35,34 @@ class QuizView extends Component {
         return;
       }
     })
+    $.ajax({
+      url: `/users`,
+      type: "GET",
+      success: (result) => {
+        this.setState({ users: result.message })
+        return;
+      },
+      error: (error) => {
+        alert('Unable to load users. Please try your request again')
+        return;
+      }
+    })
   }
 
   selectCategory = (type='all') => {
-    this.setState({quizCategory: type}, () => this.getNextQuestion());
+    this.setState({quizCategory: type}, () => this.renderSelectUser());
   }
 
   selectCategoryAll = () => {
-    this.setState({quizCategory: 'all'}, () => this.getNextQuestion());
+    this.setState({quizCategory: 'all'}, () => this.renderSelectUser());
+  }
+
+  selectUser = (id=-1) => {
+    this.setState({user_id: id}, () => this.getNextQuestion());
+  }
+
+  selectUserNone = () => {
+    this.setState({user_id: 1}, () => this.getNextQuestion());
   }
 
   handleChange = (event) => {
@@ -101,6 +123,28 @@ class QuizView extends Component {
       guess: '',
       forceEnd: false
     })
+  }
+
+  renderSelectUser(){
+      return (
+          <div className="quiz-play-holder">
+              <div className="choose-header">Choose User</div>
+              <div className="category-holder">
+                  <div className="play-category" onClick={this.selectUserNone}>None</div>
+                  {this.state.users.map((user, id) => {
+                  return (
+                    <div
+                      key={user.name}
+                      value={user.name}
+                      className="play-category"
+                      onClick={() => this.selectUser(user.id)}>
+                      {user.name}
+                    </div>
+                  )
+                })}
+              </div>
+          </div>
+      )
   }
 
   renderPrePlay(){
@@ -172,9 +216,11 @@ class QuizView extends Component {
 
 
   render() {
-    return this.state.quizCategory
+    return this.state.user_id
         ? this.renderPlay()
-        : this.renderPrePlay()
+        : this.state.quizCategory
+            ? this.renderSelectUser()
+            : this.renderPrePlay()
   }
 }
 
